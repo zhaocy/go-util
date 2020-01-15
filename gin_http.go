@@ -1,6 +1,7 @@
 package go_util
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -67,4 +68,33 @@ func Authorize() gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+func AcceptJSON(c *gin.Context, req interface{})error{
+	err := c.ShouldBindJSON(req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, &JSONErr{
+			Code: 410,
+			Msg:  err.Error(),
+		})
+		return err
+	}
+	Info("req:",ToJSON(req))
+	return nil
+}
+
+func WriteJSON(c *gin.Context, resp interface{}, err error)  {
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, &JSONErr{
+			Code: 501,
+			Msg:  err.Error(),
+		})
+	}else{
+		c.JSON(200, resp)
+	}
+}
+
+func ToJSON(data interface{}) string{
+	bytes, _ := json.Marshal(data)
+	return string(bytes)
 }
