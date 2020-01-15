@@ -5,20 +5,20 @@ import (
 )
 
 type banner struct {
-	version string
+	version    string
 	serverName string
-	mode string
+	mode       string
 }
 
-func NewBanner(serverName , version ,mode string)*banner{
+func NewBanner(serverName, version, mode string) *banner {
 	return &banner{
-		version:version,
-		serverName:serverName,
-		mode:mode,
+		version:    version,
+		serverName: serverName,
+		mode:       mode,
 	}
 }
 
-func(b *banner)Print(){
+func (b *banner) Print() {
 	fmt.Println("")
 	/*data, err := ioutil.ReadFile("./banner.txt")
 	if err == nil {
