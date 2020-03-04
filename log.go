@@ -31,7 +31,7 @@ func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 	enc.AppendString(t.Format("2006-01-02T15:04:05"))
 }
 
-func InitLogger(fileName string, level string) log.Logger {
+func loggerCore(fileName ,level string) []zapcore.Core{
 	lv := zap.DebugLevel
 	switch strings.ToLower(level) {
 	case "info":
@@ -49,9 +49,11 @@ func InitLogger(fileName string, level string) log.Logger {
 	var allCore []zapcore.Core
 	syncWritter := zapcore.AddSync(&lumberjack.Logger{
 		Filename:   fileName,
-		MaxSize:    128,
+		MaxSize:    128,  // 每个日志文件保存的最大尺寸 单位：M
+		//MaxBackups: 30,                       // 日志文件最多保存多少个备份
+		//MaxAge:     90,                        // 文件最多保存多少天
 		LocalTime:  true,
-		Compress:   false,
+		Compress:   false,  // 是否压缩
 	})
 	enc := zap.NewProductionEncoderConfig()
 	enc.EncodeTime = timeEncoder
@@ -66,7 +68,23 @@ func InitLogger(fileName string, level string) log.Logger {
 		coreConsole := zapcore.NewCore(consoleEncoder, consoleDebugging, zap.NewAtomicLevelAt(lv))
 		allCore = append(allCore, coreConsole)
 	}
+	return allCore
+}
 
+func InitServiceLogger(fileName string,level string, serviceName string) log.Logger{
+	allCore:= loggerCore(fileName,level)
+	// 设置初始化字段
+	filed := zap.Fields(zap.String("serviceName", serviceName))
+	log := zap.New(zapcore.NewTee(allCore...), zap.AddCaller(), zap.AddCallerSkip(1),filed)
+	gLogger = &zapLogger{
+		logger: log,
+		suger:  log.Sugar(),
+	}
+	return gLogger
+}
+
+func InitLogger(fileName string, level string) log.Logger {
+	allCore:= loggerCore(fileName, level)
 	log := zap.New(zapcore.NewTee(allCore...), zap.AddCaller(), zap.AddCallerSkip(1))
 	gLogger = &zapLogger{
 		logger: log,
