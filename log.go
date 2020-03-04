@@ -49,7 +49,7 @@ func loggerCore(fileName ,level string) []zapcore.Core{
 	var allCore []zapcore.Core
 	syncWritter := zapcore.AddSync(&lumberjack.Logger{
 		Filename:   fileName,
-		MaxSize:    128,  // 每个日志文件保存的最大尺寸 单位：M
+		MaxSize:    64,  // 每个日志文件保存的最大尺寸 单位：M
 		//MaxBackups: 30,                       // 日志文件最多保存多少个备份
 		//MaxAge:     90,                        // 文件最多保存多少天
 		LocalTime:  true,
@@ -74,7 +74,7 @@ func loggerCore(fileName ,level string) []zapcore.Core{
 func InitServiceLogger(fileName string,level string, serviceName string) log.Logger{
 	allCore:= loggerCore(fileName,level)
 	// 设置初始化字段
-	filed := zap.Fields(zap.String("serviceName", serviceName))
+	filed := zap.Fields(zap.String("service_name", serviceName))
 	log := zap.New(zapcore.NewTee(allCore...), zap.AddCaller(), zap.AddCallerSkip(1),filed)
 	gLogger = &zapLogger{
 		logger: log,
