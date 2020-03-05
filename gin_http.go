@@ -71,10 +71,10 @@ func Authorize() gin.HandlerFunc {
 }
 
 type RequestInfo struct {
-	Host   string
-	URL    string
-	Method string
-	Data   interface{}
+	Host    string
+	URL     string
+	Method  string
+	ReqData interface{}
 }
 
 func AcceptJSON(c *gin.Context, data interface{}) error {
@@ -87,10 +87,10 @@ func AcceptJSON(c *gin.Context, data interface{}) error {
 		return err
 	}
 	ri := &RequestInfo{
-		Host:   c.Request.Host,
-		URL:    c.Request.URL.String(),
-		Method: c.Request.Method,
-		Data:   data,
+		Host:    c.Request.Host,
+		URL:     c.Request.URL.String(),
+		Method:  c.Request.Method,
+		ReqData: data,
 	}
 	Infof("%v", ToJSON(ri))
 	return nil
