@@ -1,8 +1,8 @@
 package go_util
 
 import (
-	jsoniter "github.com/json-iterator/go"
 	"github.com/gin-gonic/gin"
+	jsoniter "github.com/json-iterator/go"
 	"net/http"
 )
 
@@ -71,11 +71,13 @@ func Authorize() gin.HandlerFunc {
 }
 
 type RequestInfo struct {
+	Host   string
+	URL    string
 	Method string
-	Data interface{}
+	Data   interface{}
 }
 
-func AcceptJSON(c *gin.Context, data interface{})error{
+func AcceptJSON(c *gin.Context, data interface{}) error {
 	err := c.ShouldBindJSON(data)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, &JSONErr{
@@ -84,26 +86,28 @@ func AcceptJSON(c *gin.Context, data interface{})error{
 		})
 		return err
 	}
-	ri:=&RequestInfo{
+	ri := &RequestInfo{
+		Host:   c.Request.Host,
+		URL:    c.Request.URL.String(),
 		Method: c.Request.Method,
-		Data: data,
+		Data:   data,
 	}
-	Infof("%v",ToJSON(ri))
+	Infof("%v", ToJSON(ri))
 	return nil
 }
 
-func WriteJSON(c *gin.Context, resp interface{}, err error)  {
+func WriteJSON(c *gin.Context, resp interface{}, err error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, &JSONErr{
 			Code: 501,
 			Msg:  err.Error(),
 		})
-	}else{
+	} else {
 		c.JSON(200, resp)
 	}
 }
 
-func ToJSON(data interface{}) string{
+func ToJSON(data interface{}) string {
 	jsonStr, err := jsoniter.ConfigCompatibleWithStandardLibrary.MarshalToString(data)
 	if err != nil {
 		Error(err)
