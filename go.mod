@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.5.0 // indirect
 	github.com/go-log/log v0.1.0
 	github.com/gomodule/redigo v2.0.0+incompatible
+	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/kjk/betterguid v0.0.0-20170621091430-c442874ba63a
 	github.com/rs/xid v1.2.1
 	github.com/satori/go.uuid v1.2.0

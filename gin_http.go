@@ -1,7 +1,7 @@
 package go_util
 
 import (
-	"encoding/json"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -70,8 +70,13 @@ func Authorize() gin.HandlerFunc {
 	}
 }
 
-func AcceptJSON(c *gin.Context, req interface{})error{
-	err := c.ShouldBindJSON(req)
+type RequestInfo struct {
+	Method string
+	Data interface{}
+}
+
+func AcceptJSON(c *gin.Context, data interface{})error{
+	err := c.ShouldBindJSON(data)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, &JSONErr{
 			Code: 410,
@@ -79,7 +84,11 @@ func AcceptJSON(c *gin.Context, req interface{})error{
 		})
 		return err
 	}
-	Info("req:",ToJSON(req))
+	ri:=&RequestInfo{
+		Method: c.Request.Method,
+		Data: data,
+	}
+	Infof("%v",ToJSON(ri))
 	return nil
 }
 
@@ -95,6 +104,10 @@ func WriteJSON(c *gin.Context, resp interface{}, err error)  {
 }
 
 func ToJSON(data interface{}) string{
-	bytes, _ := json.Marshal(data)
-	return string(bytes)
+	jsonStr, err := jsoniter.ConfigCompatibleWithStandardLibrary.MarshalToString(data)
+	if err != nil {
+		Error(err)
+		return ""
+	}
+	return jsonStr
 }
