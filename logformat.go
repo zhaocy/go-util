@@ -59,3 +59,16 @@ func (lf *LogFormat) toFormatString() string {
 	}
 	return fmt.Sprintf(lf.formatString, values...)
 }
+
+func (lf *LogFormat) ToFormatJsonString() string{
+	json := simplejson.New()
+	if lf.formatString != "" {
+		json.Set("info", lf.toFormatString())
+	}
+	marshalJSON, err := json.MarshalJSON()
+	if err != nil {
+		Error(err)
+		return ""
+	}
+	return string(marshalJSON)
+}
